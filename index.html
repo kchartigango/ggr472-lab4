@@ -17,9 +17,32 @@
 
 <body>
 
-    <!-- MAP CONTAINER -->
-    <div id='map' class='map'></div>
+    <!--Map container-->
+    <div id='map' class='map-container'></div>
 
+    <!--Navigation elements-->
+    <div class = 'map-search-container'>
+        <label>Search Toronto</label>
+        <div id="geocoder" class="geocoder"></div>
+        <button type="button" class="btn btn-primary btn-sm" id="returnbutton">Return to full extent</button>
+    </div>
+
+    <!--Legend classified according to number of collisions-->
+    <div id='rating-legend' class='legend'>
+        <h4>Number of Road Collisions</h4>
+        <div><span style='background-color: #ffffcc'></span>0-4</div>
+        <div><span style='background-color: #a1dab4'></span>5-9</div>
+        <div><span style='background-color: #41b6c4'></span>10-14</div>
+        <div><span style='background-color: #253494'></span>>15</div>
+    </div>
+
+    <!--Loading the mapbox-gl-geocoder plugin.-->
+    <script
+        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.2/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet"
+        href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.2/mapbox-gl-geocoder.css"
+        type="text/css">
+        
     <script src="script.js"></script>
 
 </body>
