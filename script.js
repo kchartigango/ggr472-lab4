@@ -47,7 +47,7 @@ map.on('load', () => {
         'type': 'circle',
         'source': 'collis-points',
         'paint': {
-            'circle-radius': 5,
+            'circle-radius': 3,
             'circle-color': 'lavender',
             'circle-stroke-color': 'purple',
             'circle-stroke-width': 1
