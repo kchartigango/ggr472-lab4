@@ -110,20 +110,20 @@ Step 4: AGGREGATE COLLISIONS BY HEXGRID
 
     collisionhex.features.forEach((feature) => { //The forEach loop iterates through each hexagon in hexgeojson
         feature.properties.COUNT = feature.properties.values.length //The 'COUNT' property will have as many features as the dataset it is drawing from
-        if (feature.properties.COUNT > maxcollision) { //If the number of collisions is greater than 0, it will be stored in the 'COUNT' property
+        if (feature.properties.COUNT > maxcollision) { //If the number of collisions in the hexagon is greater than 0, it will be stored in the 'COUNT' property
             console.log(feature);
-            maxcollision = feature.properties.COUNT
+            maxcollision = feature.properties.COUNT //The 'COUNT' property, or the number of collisions in that hexagon gets stored in the variable maxcollision
         }
     });
     console.log(maxcollision);
 
     map.addSource('hex-collect', {
         type: 'geojson',
-        source: maxcollision
+        source: collisionhex
     });
 
     map.addLayer({
-        'id': 'collision-hex-fill',
+        'id': 'collect-hex-fill',
         'type': 'fill',
         'source': 'hex-collect',
         'paint': {
@@ -139,26 +139,9 @@ Step 4: AGGREGATE COLLISIONS BY HEXGRID
             'fill-opacity': 0.8
         }
     });
-
-    // map.addLayer({
-    //     'id': 'collision-hex-fill',
-    //     'type': 'fill',
-    //     'source': 'bbox-coords',
-    //     'paint': {
-    //         'fill-color': [
-    //             'step',
-    //             ['get', 'COUNT'],
-    //             '#ffffcc',
-    //             10, '#a1dab',
-    //             25, '#41b6c4'
-    //             ],
-    //         'fill-opacity': 0.7,
-    //         'fill-outline-color': 'teal'
-    //     }
-    // });
 });
 
-map.on('click', 'collision-hex-fill', (e) => {
+map.on('click', 'collect-hex-fill', (e) => {
     new mapboxgl.Popup()
     .setLngLat(e.lngLat)
     .setHTML("<b>Collision count:</b> " + e.features[0].properties.COUNT)
