@@ -1,8 +1,49 @@
-.map {
+.map-container{
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     width: 100%;
+}
+
+.map-search-container {
+    position: absolute;
+    font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    background: rgba(255, 255, 255, 0.8);
+    top: 0;
+    left: 0;
+    margin: 10px 0 0 10px; /*top margin, right margin, bottom margin, left margin*/
+    padding: 10px; /*around elements inside of overlay*/
+    overflow: visible;
+}
+
+#geocoder {
+    position: relative;
+    margin: 10px 0 10px;
+}
+
+.legend {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 3px;
+    bottom: 0;
+    margin-bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /*horizontal shadow, vertical shadow, size of shadow, color*/
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    right: 10px;
+    z-index: 1;
+}
+
+.legend h4 {
+    margin: 0 0 10px;
+}
+
+.legend div span {
+    display: inline-block;
+    border-radius: 50%; /*curve border to make a circle*/
+    height: 10px; /*size of circle*/
+    width: 10px;
+    margin-right: 5px; /*position of circle*/
 }
