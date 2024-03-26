@@ -32,6 +32,28 @@ fetch('https://raw.githubusercontent.com/kchartigango/ggr472-lab4/main/pedcyc_co
         collisiongeojson = response; //Storing the geojson as a variable using the data URL from fetch response
     });
 
+//Loading data to map using GeoJSON variable
+map.on('load', () => {
+
+    //Adding underlying source data to view the points
+    map.addSource('collis-points', {
+        type: 'geojson',
+        data: collisiongeojson
+    })
+
+    //Visualizing the collision point data on a layer
+    map.addLayer({
+        'id': 'collis-point-layer',
+        'type': 'circle',
+        'source': 'collis-points',
+        'paint': {
+            'circle-radius': 5,
+            'circle-color': 'lavender',
+            'circle-stroke-color': 'purple',
+            'circle-stroke-width': 1
+        }
+    })
+
 /*--------------------------------------------------------------------
     Step 3: CREATE BOUNDING BOX AND HEXGRID
 --------------------------------------------------------------------*/
@@ -40,10 +62,7 @@ fetch('https://raw.githubusercontent.com/kchartigango/ggr472-lab4/main/pedcyc_co
 //      Access and store the bounding box coordinates as an array variable
 //      Use bounding box coordinates as argument in the turf hexgrid function
 
-//Loading data to map using GeoJSON variable
-
-map.on('load', () => {
-
+    // let bboxgeojson;
     let bbox = turf.envelope(collisiongeojson);
     let bboxscaled = turf.transformScale(bbox, 1.10);
 
