@@ -16,6 +16,16 @@ const map = new mapboxgl.Map({
     zoom: 12 // starting zoom level
 });
 
+//Adding a search control to the map overlay, linked to a plugin on the HTML page
+const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
+    countries: 'ca'
+});
+
+//Appending geocoder variable to the geocoder HTML div to position it on the page
+document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+
 /*--------------------------------------------------------------------
 Step 2: VIEW GEOJSON POINT DATA ON MAP
 --------------------------------------------------------------------*/
@@ -62,7 +72,6 @@ map.on('load', () => {
 //      Access and store the bounding box coordinates as an array variable
 //      Use bounding box coordinates as argument in the turf hexgrid function
 
-    // let bboxgeojson;
     let bbox = turf.envelope(collisiongeojson);
     let bboxscaled = turf.transformScale(bbox, 1.10);
 
@@ -71,24 +80,14 @@ map.on('load', () => {
         "type": "FeatureCollection",
         "features": [bboxscaled]
     };
-
-    //Creating a hexgrid
-    console.log(bboxscaled)
-    console.log(bboxscaled.geometry.coordinates)
     
-    let bboxcoords = [bboxscaled.geometry.coordinates[0][0][0], //minX
-                    bboxscaled.geometry.coordinates[0][0][1], //minY
-                    bboxscaled.geometry.coordinates[0][2][0], //maxX
-                    bboxscaled.geometry.coordinates[0][2][1]]; //maxY
-        
-    // let bboxcoords = turf.bbox(collisiongeojson); - simplified code for bounding box
-    let hexgeojson = turf.hexGrid(bboxcoords, 0.5, { units: 'kilometers' });
-    
+    //Adding source for the bounding box
     map.addSource('bbox-collis', {
         type: 'geojson',
         data: bboxgeojson
     });
 
+    //Visualizing the bounding box on the map
     map.addLayer({
         'id': 'bbox-collis-points',
         'type': 'fill',
@@ -100,15 +99,29 @@ map.on('load', () => {
         }
     });
 
-    map.addSource('bbox-coords', {
+    //Creating a hexgrid stored in variable hexgeojson
+    console.log(bboxscaled) //Viewing the scaled bounding box and its coordinates on the console log
+    console.log(bboxscaled.geometry.coordinates)
+    
+    let bboxcoords = [bboxscaled.geometry.coordinates[0][0][0], //minX
+                    bboxscaled.geometry.coordinates[0][0][1], //minY
+                    bboxscaled.geometry.coordinates[0][2][0], //maxX
+                    bboxscaled.geometry.coordinates[0][2][1]]; //maxY
+        
+    // let bboxcoords = turf.bbox(collisiongeojson); - simplified code for bounding box
+    let hexgeojson = turf.hexGrid(bboxcoords, 0.5, { units: 'kilometers' });
+
+    //Adding source for the hexgrid layer
+    map.addSource('hexgrid-coords', {
         type: 'geojson',
         data: hexgeojson
     });
 
+    //Visualizing the hexgrid layer on the map
     map.addLayer({
         'id': 'hex-layer',
         'type': 'fill',
-        'source': 'bbox-coords',
+        'source': 'hexgrid-coords',
         'paint': {
             'fill-color': 'green',
             'fill-opacity': 0.5,
@@ -122,25 +135,28 @@ Step 4: AGGREGATE COLLISIONS BY HEXGRID
 //HINT: Use Turf collect function to collect all '_id' properties from the collision points data for each heaxagon
 //      View the collect output in the console. Where there are no intersecting points in polygons, arrays will be empty
 
+    //Creating a new hexgrid variable for the collected properties
     let collisionhex = turf.collect(hexgeojson, collisiongeojson, '_id', 'values');
 
-    // Counting the number of features inside each hexagon and identifying the max value
+    //Creating the variable maxcollision that starts with 0
     let maxcollision = 0;
 
     collisionhex.features.forEach((feature) => { //The forEach loop iterates through each hexagon in hexgeojson
         feature.properties.COUNT = feature.properties.values.length //The 'COUNT' property will have as many features as the dataset it is drawing from
         if (feature.properties.COUNT > maxcollision) { //If the number of collisions in the hexagon is greater than 0, it will be stored in the 'COUNT' property
-            console.log(feature);
-            maxcollision = feature.properties.COUNT //The 'COUNT' property, or the number of collisions in that hexagon gets stored in the variable maxcollision
+            console.log(feature); //Viewing the feature in the console
+            maxcollision = feature.properties.COUNT //The maximum number of collisions in that hexagon gets stored in the variable maxcollision
         }
     });
-    console.log(maxcollision);
+    console.log(maxcollision); //Viewing the maxcollision variable in the console log after the forEach loop has run
 
+    //Adding source for the hexgrid collision count layer
     map.addSource('hex-collect', {
         type: 'geojson',
         source: collisionhex
     });
 
+    //Visualizing the hexgrid collision count layer on the map
     map.addLayer({
         'id': 'collect-hex-fill',
         'type': 'fill',
@@ -150,21 +166,14 @@ Step 4: AGGREGATE COLLISIONS BY HEXGRID
                 'step', //The 'step' expression here will produce stepped results based on the retrieved values.
                 ['get', 'COUNT'], //The 'get' expression will retrieve each property value from the 'COUNT' data field.
                 '#ffffcc', //The color assigned to any values < first step.
-                10, '#a1dab4', //The subsequent colors assigned to values >= each step.
-                20, '#41b6c4',
-                30, '#253494'
+                5, '#a1dab4', //The subsequent colors assigned to values >= each step.
+                10, '#41b6c4',
+                15, '#253494'
                 ],
             'fill-outline-color': 'teal',
-            'fill-opacity': 0.8
+            'fill-opacity': 1
         }
     });
-});
-
-map.on('click', 'collect-hex-fill', (e) => {
-    new mapboxgl.Popup()
-    .setLngLat(e.lngLat)
-    .setHTML("<b>Collision count:</b> " + e.features[0].properties.COUNT)
-    .addTo(map);
 });
 
 // /*--------------------------------------------------------------------
@@ -177,4 +186,32 @@ map.on('click', 'collect-hex-fill', (e) => {
 //        - The maximum number of collisions found in a hexagon
 //      Add a legend and additional functionality including pop-up windows
 
+//Adding zoom and rotation controls to the web map 
+map.addControl(new mapboxgl.NavigationControl());
 
+map.addControl(new mapboxgl.FullscreenControl());
+
+//Adding event listener which returns map view to full screen on button click using the flyTo method
+document.getElementById('returnbutton').addEventListener('click', () => {
+    map.flyTo({
+        center: [-79.37, 43.70],
+        zoom: 10,
+        essential: true
+    });
+});
+
+map.on('mouseenter', 'collect-hex-fill', () => {
+    map.getCanvas().style.cursor = 'pointer'; //This changes the cursor to pointer style when mouse is over a hexgrid
+});
+
+map.on('mouseleave', 'collect-hex-fill', () => {
+    map.getCanvas().style.cursor = ''; //This returns cursor to its original style when mouse leaves the hexgrids
+});
+
+map.on('click', 'collect-hex-fill', (e) => {
+    new mapboxgl.Popup() //Declaring a new popup object with each click on the point
+        .setLngLat(e.lngLat)
+        .setHTML("<b>Collision Count:</b> " + e.features[0].properties.COUNT + "<br>" +
+            "<b>Neighborhood:</b> " + e.features[0].properties.NEIGHBOURHOOD_158) //Using click event properties to add text to the popup box
+        .addTo(map); //Show the popup on the web map
+});
