@@ -1,4 +1,4 @@
-.map-container{
+.map-container {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -8,7 +8,7 @@
 }
 
 .map-search-container {
-    position: absolute;
+    position: relative;
     font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     background: rgba(255, 255, 255, 0.8);
     top: 0;
@@ -16,7 +16,54 @@
     margin: 10px 0 0 10px; /*top margin, right margin, bottom margin, left margin*/
     padding: 10px; /*around elements inside of overlay*/
     overflow: visible;
+    width: 30%
 }
+
+.return-button-container {
+    position: relative;
+    font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    top: 0;
+    left: 0;
+    margin: 10px 0 0 10px; /*top margin, right margin, bottom margin, left margin*/
+    padding: 10px; /*around elements inside of overlay*/
+    overflow: visible;
+}
+
+.collision-point-container {
+    position: relative;
+    font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    top: 0;
+    left: 0;
+    margin: 10px 0 0 10px; /*top margin, right margin, bottom margin, left margin*/
+    padding: 10px; /*around elements inside of overlay*/
+    overflow: visible;
+}
+
+.bbox-button-container {
+    position: relative;
+    font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    top: 0;
+    left: 0;
+    margin: 10px 0 0 10px; /*top margin, right margin, bottom margin, left margin*/
+    padding: 10px; /*around elements inside of overlay*/
+    overflow: visible;
+}
+
+.hex-button-container {
+    position: relative;
+    font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    top: 0;
+    left: 0;
+    margin: 10px 0 0 10px; /*top margin, right margin, bottom margin, left margin*/
+    padding: 10px; /*around elements inside of overlay*/
+    overflow: visible;
+}
+
+/* .btn {
+    position: relative;
+    margin: 10px 0 10px;
+    width: 10%
+} */
 
 #geocoder {
     position: relative;
