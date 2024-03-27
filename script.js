@@ -45,24 +45,27 @@ fetch('https://raw.githubusercontent.com/kchartigango/ggr472-lab4/main/pedcyc_co
 //Loading data to map using GeoJSON variable
 map.on('load', () => {
 
-    //Adding underlying source data to view the points
-    map.addSource('collis-points', {
-        type: 'geojson',
-        data: collisiongeojson
-    })
+    document.getElementById('pointsbutton').addEventListener('click', () => {
 
-    //Visualizing the collision point data on a layer
-    map.addLayer({
-        'id': 'collis-point-layer',
-        'type': 'circle',
-        'source': 'collis-points',
-        'paint': {
-            'circle-radius': 3,
-            'circle-color': 'lavender',
-            'circle-stroke-color': 'purple',
-            'circle-stroke-width': 1
-        }
-    })
+        //Adding underlying source data to view the points
+        map.addSource('collis-points', {
+            type: 'geojson',
+            data: collisiongeojson
+        })
+
+        //Visualizing the collision point data on a layer
+        map.addLayer({
+            'id': 'collis-point-layer',
+            'type': 'circle',
+            'source': 'collis-points',
+            'paint': {
+                'circle-radius': 4,
+                'circle-color': 'plum',
+                'circle-stroke-color': 'purple',
+                'circle-stroke-width': 1
+            }
+        })
+    });
 
 /*--------------------------------------------------------------------
     Step 3: CREATE BOUNDING BOX AND HEXGRID
@@ -81,22 +84,26 @@ map.on('load', () => {
         "features": [bboxscaled]
     };
     
-    //Adding source for the bounding box
-    map.addSource('bbox-collis', {
-        type: 'geojson',
-        data: bboxgeojson
-    });
+    document.getElementById('bboxbutton').addEventListener('click', () => {
 
-    //Visualizing the bounding box on the map
-    map.addLayer({
-        'id': 'bbox-collis-points',
-        'type': 'fill',
-        'source': 'bbox-collis',
-        'paint': {
-            'fill-color': 'lavender',
-            'fill-opacity': 0.5,
-            'fill-outline-color': 'purple'
-        }
+        //Adding source for the bounding box
+        map.addSource('bbox-collis', {
+            type: 'geojson',
+            data: bboxgeojson
+        });
+
+        //Visualizing the bounding box on the map
+        map.addLayer({
+            'id': 'bbox-collis-points',
+            'type': 'fill',
+            'source': 'bbox-collis',
+            'paint': {
+                'fill-color': 'lavender',
+                'fill-opacity': 0.5,
+                'fill-outline-color': 'purple'
+            }
+        });
+
     });
 
     //Creating a hexgrid stored in variable hexgeojson
@@ -117,17 +124,17 @@ map.on('load', () => {
         data: hexgeojson
     });
 
-    //Visualizing the hexgrid layer on the map
-    map.addLayer({
-        'id': 'hex-layer',
-        'type': 'fill',
-        'source': 'hexgrid-coords',
-        'paint': {
-            'fill-color': 'green',
-            'fill-opacity': 0.5,
-            'fill-outline-color': 'green'
-        }
-    });
+    // //Visualizing the hexgrid layer on the map
+    // map.addLayer({
+    //     'id': 'hex-layer',
+    //     'type': 'fill',
+    //     'source': 'hexgrid-coords',
+    //     'paint': {
+    //         'fill-color': 'green',
+    //         'fill-opacity': 0.5,
+    //         'fill-outline-color': 'green'
+    //     }
+    // });
 
 /*--------------------------------------------------------------------
 Step 4: AGGREGATE COLLISIONS BY HEXGRID
@@ -135,7 +142,7 @@ Step 4: AGGREGATE COLLISIONS BY HEXGRID
 //HINT: Use Turf collect function to collect all '_id' properties from the collision points data for each heaxagon
 //      View the collect output in the console. Where there are no intersecting points in polygons, arrays will be empty
 
-    //Creating a new hexgrid variable for the collected properties
+    //Creating a new hexgrid variable that collects each collision based on its id
     let collisionhex = turf.collect(hexgeojson, collisiongeojson, '_id', 'values');
 
     //Creating the variable maxcollision that starts with 0
@@ -150,29 +157,33 @@ Step 4: AGGREGATE COLLISIONS BY HEXGRID
     });
     console.log(maxcollision); //Viewing the maxcollision variable in the console log after the forEach loop has run
 
-    //Adding source for the hexgrid collision count layer
-    map.addSource('hex-collect', {
-        type: 'geojson',
-        source: collisionhex
-    });
+    document.getElementById('hexgridbutton').addEventListener('click', () => {
+        //Adding source for the hexgrid collision count layer
+        map.addSource('hex-collect', {
+            type: 'geojson',
+            data: collisionhex
+        });
 
-    //Visualizing the hexgrid collision count layer on the map
-    map.addLayer({
-        'id': 'collect-hex-fill',
-        'type': 'fill',
-        'source': 'hex-collect',
-        'paint': {
-            'fill-color': [
-                'step', //The 'step' expression here will produce stepped results based on the retrieved values.
-                ['get', 'COUNT'], //The 'get' expression will retrieve each property value from the 'COUNT' data field.
-                '#ffffcc', //The color assigned to any values < first step.
-                5, '#a1dab4', //The subsequent colors assigned to values >= each step.
-                10, '#41b6c4',
-                15, '#253494'
-                ],
-            'fill-outline-color': 'teal',
-            'fill-opacity': 1
-        }
+        //Visualizing the hexgrid collision count layer on the map
+        map.addLayer({
+            'id': 'collect-hex-fill',
+            'type': 'fill',
+            'source': 'hex-collect',
+            'paint': {
+                'fill-color': [
+                    'step', //The 'step' expression here will produce stepped results based on the retrieved values.
+                    ['get', 'COUNT'], //The 'get' expression will retrieve each property value from the 'COUNT' data field.
+                    '#ffffcc', //The color assigned to any values < first step.
+                    1, '#c7e9b4', //The subsequent colors assigned to values >= each step.
+                    11, '#7fcdbb',
+                    21, '#41b6c4',
+                    31, '#2c7fb8',
+                    41, '#253494'
+                    ],
+                'fill-outline-color': 'teal',
+                'fill-opacity': 0.5
+            }
+        });
     });
 });
 
@@ -211,7 +222,27 @@ map.on('mouseleave', 'collect-hex-fill', () => {
 map.on('click', 'collect-hex-fill', (e) => {
     new mapboxgl.Popup() //Declaring a new popup object with each click on the point
         .setLngLat(e.lngLat)
-        .setHTML("<b>Collision Count:</b> " + e.features[0].properties.COUNT + "<br>" +
-            "<b>Neighborhood:</b> " + e.features[0].properties.NEIGHBOURHOOD_158) //Using click event properties to add text to the popup box
+        .setHTML("<b>Collision count:</b> " + e.features[0].properties.COUNT) //Using click event properties to add text to the popup box
         .addTo(map); //Show the popup on the web map
+
+        // .setHTML("<b>Collision count:</b> " + e.features[0].properties.COUNT + "<br>" +
+        //     "<b>Neighborhood:</b> " + collisiongeojson.features[0].properties.NEIGHBOURHOOD_158) //Using click event properties to add text to the popup box
+});
+
+map.on('mouseenter', 'collis-point-layer', () => {
+    map.getCanvas().style.cursor = 'pointer'; //This changes the cursor to pointer style when mouse is over a collision point
+});
+
+map.on('mouseleave', 'collis-point-layer', () => {
+    map.getCanvas().style.cursor = ''; //This returns cursor to its original style when mouse leaves the collision point
+});
+
+map.on('click', 'collis-point-layer', (e) => {
+    new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML("<b>Accident classification:</b> " + e.features[0].properties.ACCLASS + "<br>" +
+        "<b>Involvement type:</b> " + e.features[0].properties.INVTYPE + "<br>" +
+        "<b>Severity of injury:</b> " + e.features[0].properties.INJURY + "<br>" +
+        "<b>Neighborhood:</b> " + e.features[0].properties.NEIGHBOURHOOD_158)
+        .addTo(map);
 });
